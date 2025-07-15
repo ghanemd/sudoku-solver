@@ -2,11 +2,14 @@ class SudokuCreator:
     def __init__(self, sudoku):
         pass
 
-    def save(self, assignement, file_name):
-        pass
 
-    def solve(solve):
-        pass
+    def solve(self):
+        """
+        Enforce node consistency, arc consistency then solve the CSP using the backtracking algorithm.
+        """
+        self.enforce_node_consistency()
+        self.ac3()
+        self.backtrack(dict())
 
     def enforce_node_consistency(self):
         pass
@@ -21,9 +24,6 @@ class SudokuCreator:
         pass
 
     def assignement_consistent(self, assignement):
-        pass
-
-    def order_domain_values(self, var, assignment):
         pass
 
     def select_unassigned_variable(self, assignment):
