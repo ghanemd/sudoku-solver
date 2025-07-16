@@ -1,5 +1,6 @@
 import sys
 from sudoku import *
+from collections import deque
 
 class SudokuCreator:
     def __init__(self, sudoku):
@@ -29,13 +30,49 @@ class SudokuCreator:
                 self.domains[var] = {self.sudoku.structure[var.i][var.j]}
 
     def revise(self, x, y):
-        pass
+        """
+        Make variable `x` arc consistent with variable `y`.
+        To do so, remove values from `self.domains[x]` for which there is no
+        possible corresponding value for `y` in `self.domains[y]`.
+
+        Return True if a revision was made to the domain of `x`; return
+        False if no revision was made.
+        """
+        revision = False
+        if x in self.sudoku.neighbors(y):
+            for val in self.domains[x]:
+                if any(v != val for v in self.domains[y]):
+                    self.domains[x].remove(val)
+                    revision = True
+        return revision
+
 
     def ac3(self):
-        pass
+        """
+        Update `self.domains` such that each variable is arc consistent.
+
+        Return True if arc consistency is enforced and no domains are empty;
+        return False if one or more domains end up empty.
+        """
+        arcs_list = []
+        for x in self.domains:
+            for y in self.sudoku.neighbors(x):
+                arcs_list.append((x,y))
+        arcs_queue = deque(arcs_list)
+        while arcs_queue:
+            x, y = arcs_queue.popleft()
+            if self.revise(x,y):
+                if len(self.domains[x]) == 0:
+                    return False
+                else:
+                    for z in self.sudoku.neighbors(x):
+                        if z != y:
+                            arcs_queue.append((z,x))
+        return True
+
 
     def assignement_complete(self, assignement):
-        pass
+        return len(self.domains) == len(assignement)
 
     def assignement_consistent(self, assignement):
         pass
