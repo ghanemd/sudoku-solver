@@ -1,6 +1,7 @@
 import sys
 from sudoku import *
 from collections import deque
+import copy
 
 class SudokuCreator:
     def __init__(self, sudoku):
@@ -10,6 +11,8 @@ class SudokuCreator:
             for var in self.sudoku.variables
         }
 
+    def save(self, assignment, filename):    # Implement with Pillow library
+        pass
 
     def solve(self):
         """
@@ -75,13 +78,38 @@ class SudokuCreator:
         return len(self.domains) == len(assignement)
 
     def assignement_consistent(self, assignement):
-        pass
+        """
+        Return True if `assignment` is consistent; return False otherwise.
+        """
+        for x in assignement:
+            for y in assignement:
+                if x != y and self.sudoku.are_neighbors(x, y) and assignement[x] == assignement[y]:
+                    return False
+        return True
 
-    def select_unassigned_variable(self, assignment):
+    def select_unassigned_variable(self, assignment):   # Missing implementation with heuristics
         pass
 
     def backtrack(self, assignment):
-        pass
+        """
+        Using Backtracking Search, take as input a partial assignment for the
+        crossword and return a complete assignment if possible to do so.
+
+        `assignment` is a mapping from variables (keys) to integers (values).
+
+        If no assignment is possible, return None.
+        """
+        if self.assignement_complete(assignment):
+            return assignment
+        var = self.select_unassigned_variable(assignment)
+        for val in self.domains[var]:
+            assignment_copy = copy.deepcopy(assignment)
+            assignment_copy[var] = val
+            if self.assignement_consistent(assignment_copy):
+                result = self.backtrack(assignment_copy)
+                if result is not None:
+                    return result
+        return None
 
 
 def main():

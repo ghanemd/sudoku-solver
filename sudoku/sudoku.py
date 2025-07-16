@@ -50,5 +50,8 @@ class Sudoku:
         """
         return set(
             v for v in self.variables
-            if v != var and (v.i == var.i or v.j == var.j or (v.i // 3 == var.i // 3 and v.j // 3 == var.j // 3))
+            if v != var and self.are_neighbors(v, var)
         )
+    
+    def are_neighbors(self, var1, var2):
+        return var1.i == var2.i or var1.j == var2.j or (var1.i // 3 == var2.i // 3 and var1.j // 3 == var2.j // 3)
