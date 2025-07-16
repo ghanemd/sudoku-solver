@@ -41,8 +41,7 @@ class Sudoku:
         self.variables = set()
         for i in range(self.height):
             for j in range(self.width):
-                if self.structure[i][j] == None:
-                    self.variables.add(Variable(i, j))
+                self.variables.add(Variable(i, j))
 
 
     def neighbors(self, var):

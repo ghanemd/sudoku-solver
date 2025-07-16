@@ -1,6 +1,13 @@
+import sys
+from sudoku import *
+
 class SudokuCreator:
     def __init__(self, sudoku):
-        pass
+        self.sudoku = sudoku
+        self.domains = {
+            var:set(range(1, 10))
+            for var in self.sudoku.variables
+        }
 
 
     def solve(self):
@@ -12,7 +19,14 @@ class SudokuCreator:
         self.backtrack(dict())
 
     def enforce_node_consistency(self):
-        pass
+        """
+        Update `self.domains` such that each variable is node-consistent.
+        (Remove any values that are inconsistent with a variable's unary
+         constraints; in this case, the values defined by the structure of the sudoku.)
+        """
+        for var in self.domains:
+            if self.sudoku.structure[var.i][var.j] != None:
+                self.domains[var] = {self.sudoku.structure[var.i][var.j]}
 
     def revise(self, x, y):
         pass
@@ -34,7 +48,24 @@ class SudokuCreator:
 
 
 def main():
-    pass
+    
+    # Check usage
+    if len(sys.argv) != 2:
+        sys.exit("Invalid usage")
+
+    # Parse command-line arguments
+    file_name = sys.argv[1]
+
+    # Generate sudoku
+    sudoku = Sudoku(file_name)
+    creator = SudokuCreator(sudoku)
+    assignement = creator.solve()
+
+    # Print result
+    if assignement is None:
+        print("No solution.")
+    else:
+        pass
 
 
 if __name__ == "__main__":
