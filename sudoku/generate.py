@@ -88,7 +88,16 @@ class SudokuCreator:
         return True
 
     def select_unassigned_variable(self, assignment):   # Missing implementation with heuristics
-        pass
+        """
+        Return an unassigned variable not already part of `assignment`.
+        Choose the variable with the minimum number of remaining values
+        in its domain. If there is a tie, choose the variable with the highest
+        degree. If there is a tie, any of the tied variables are acceptable
+        return values.
+        """
+        unassigned_variables = [var for var in self.domains if var not in assignment]
+        return min(unassigned_variables,
+                   key=lambda var : (len(self.domains[var]), -len(self.sudoku.neighbors(var))) )
 
     def backtrack(self, assignment):
         """
