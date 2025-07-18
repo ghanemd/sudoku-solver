@@ -99,6 +99,27 @@ class SudokuCreator:
         return min(unassigned_variables,
                    key=lambda var : (len(self.domains[var]), -len(self.sudoku.neighbors(var))) )
 
+    def order_domain_values(self, var, assignment):   # Least constraining value (LCV) heuristic
+        """
+        Return a list of values in the domain of `var`, in order by
+        the number of values they rule out for neighboring variables.
+        The first value in the list, for example, should be the one
+        that rules out the fewest values among the neighbors of `var`.
+        """
+        var_values = self.domains[var]   
+        var_neighbors = self.sudoku.neighbors(var)
+        conflicts = {val : 0 for val in var_values}
+        for val in var_values:
+            for neignbor in var_neighbors:
+                if neignbor in assignment:
+                    continue
+                if val in self.domains[neignbor]:
+                    conflicts[val] += 1
+        
+        # look for the key with smallest value 
+        return sorted(conflicts , key = lambda value : conflicts[value])
+        
+
     def backtrack(self, assignment):
         """
         Using Backtracking Search, take as input a partial assignment for the
@@ -111,7 +132,7 @@ class SudokuCreator:
         if self.assignement_complete(assignment):
             return assignment
         var = self.select_unassigned_variable(assignment)
-        for val in self.domains[var]:
+        for val in self.order_domain_values(var, assignment):
             assignment_copy = copy.deepcopy(assignment)
             assignment_copy[var] = val
             if self.assignement_consistent(assignment_copy):
