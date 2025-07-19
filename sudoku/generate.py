@@ -2,6 +2,7 @@ import sys
 from sudoku import *
 from collections import deque
 import copy
+from PIL import Image, ImageDraw, ImageFont
 
 class SudokuCreator:
     def __init__(self, sudoku):
@@ -11,8 +12,47 @@ class SudokuCreator:
             for var in self.sudoku.variables
         }
 
-    def save(self, assignment, filename):    # Implement with Pillow library
-        pass
+    def save(self, assignment, filename):   
+        """
+        Save the sudoku assignment to an image file.
+        """
+        cell_size = 50
+        cell_border = 2
+        interior_size = cell_size - 2 * cell_border
+
+        img = Image.new(
+            "RGBA",
+            (self.sudoku.width * cell_size,
+             self.sudoku.height * cell_size),
+            "black"
+        )
+        font = ImageFont.truetype("assets/fonts/OpenSans-Regular.ttf", 35)
+        draw = ImageDraw.Draw(img)
+
+        for i in range(self.sudoku.height):
+            for j in range(self.sudoku.width):
+
+                rect = [
+                    (j * cell_size + cell_border,
+                     i * cell_size + cell_border),
+                    ((j + 1) * cell_size - cell_border,
+                     (i + 1) * cell_size - cell_border)
+                ]
+
+                if self.sudoku.structure[i][j] != None :
+                    draw.rectangle(rect, fill="green")
+                else:
+                    draw.rectangle(rect, fill="white")
+
+                txt = str(self.get_digit_from_assignement(assignment, i, j))
+                _, _, w, h = draw.textbbox((0, 0), txt, font=font)
+                draw.text(
+                    (rect[0][0] + ((interior_size - w) / 2),
+                     rect[0][1] + ((interior_size - h) / 2) - 10),
+                    txt, fill="black", font=font
+                )
+
+        img.save(filename)
 
     def solve(self):
         """
@@ -141,27 +181,34 @@ class SudokuCreator:
                 if result is not None:
                     return result
         return None
+    
+    def get_digit_from_assignement(self, assignement, i, j):
+        for var in assignement:
+            if var.i == i and var.j == j:
+                return assignement[var]
+        return None
 
 
 def main():
     
     # Check usage
-    if len(sys.argv) != 2:
+    if len(sys.argv) != 3:
         sys.exit("Invalid usage")
 
     # Parse command-line arguments
     file_name = sys.argv[1]
+    output_file_name = sys.argv[2]
 
     # Generate sudoku
     sudoku = Sudoku(file_name)
     creator = SudokuCreator(sudoku)
-    assignement = creator.solve()
+    assignment = creator.solve()
 
     # Print result
-    if assignement is None:
+    if assignment is None:
         print("No solution.")
     else:
-        print(assignement)
+        creator.save(assignment, output_file_name)
 
 
 if __name__ == "__main__":
