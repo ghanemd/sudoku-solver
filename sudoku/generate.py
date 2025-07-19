@@ -20,7 +20,7 @@ class SudokuCreator:
         """
         self.enforce_node_consistency()
         self.ac3()
-        self.backtrack(dict())
+        return self.backtrack(dict())
 
     def enforce_node_consistency(self):
         """
@@ -43,8 +43,9 @@ class SudokuCreator:
         """
         revision = False
         if x in self.sudoku.neighbors(y):
-            for val in self.domains[x]:
-                if any(v != val for v in self.domains[y]):
+            x_domain_copy = copy.deepcopy(self.domains[x])
+            for val in x_domain_copy:
+                if not any(val != other for other in self.domains[y]):
                     self.domains[x].remove(val)
                     revision = True
         return revision
@@ -74,10 +75,10 @@ class SudokuCreator:
         return True
 
 
-    def assignement_complete(self, assignement):
+    def assignment_complete(self, assignement):
         return len(self.domains) == len(assignement)
 
-    def assignement_consistent(self, assignement):
+    def assignment_consistent(self, assignement):
         """
         Return True if `assignment` is consistent; return False otherwise.
         """
@@ -129,13 +130,13 @@ class SudokuCreator:
 
         If no assignment is possible, return None.
         """
-        if self.assignement_complete(assignment):
+        if self.assignment_complete(assignment):
             return assignment
         var = self.select_unassigned_variable(assignment)
         for val in self.order_domain_values(var, assignment):
             assignment_copy = copy.deepcopy(assignment)
             assignment_copy[var] = val
-            if self.assignement_consistent(assignment_copy):
+            if self.assignment_consistent(assignment_copy):
                 result = self.backtrack(assignment_copy)
                 if result is not None:
                     return result
@@ -160,7 +161,7 @@ def main():
     if assignement is None:
         print("No solution.")
     else:
-        pass
+        print(assignement)
 
 
 if __name__ == "__main__":
